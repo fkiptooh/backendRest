@@ -9,21 +9,21 @@ export const login =async (req: express.Request, res: express.Response) => {
             return res.sendStatus(400);
         }
 
-        const user = getUserByEmail(email).select('+authentication.salt +authentication.password');
+        const user = await getUserByEmail(email).select('+authentication.salt +authentication.password');
         if (!user) {
             return res.sendStatus(400);
         }
 
-        const expectedHash = authentication((await user).authentication.salt, password);
+        const expectedHash = authentication(user.authentication.salt, password);
 
         if ((await user).authentication.password !== expectedHash) {
             return res.sendStatus(403);
         }
 
         const salt = random();
-        (await user).authentication.sessionToken = authentication(salt, (await user)._id.toString());
+        user.authentication.sessionToken = authentication(salt, (await user)._id.toString());
 
-        res.cookie('BACKEND-REST-API', (await user).authentication.sessionToken, { domain: 'localhost', path: '/'})
+        res.cookie('BACKEND-REST-API', user.authentication.sessionToken, { domain: 'localhost', path: '/'})
 
         return res.status(200).json(user).end();
     } catch (error) {
