@@ -3,7 +3,8 @@ import http from 'http';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
-import cors from 'cors'
+import cors from 'cors';
+import mongoose from 'mongoose';
 
 const app =  express()
 app.use(cors({
@@ -19,3 +20,10 @@ const server = http.createServer(app);
 server.listen(8080, ()=> {
     console.log("Server listinig on http://localhost:8080/")
 })
+
+const MONGO_URL = 'mongodb+srv://flexlexa5:YH1QHtqVxNKWC38p@cluster0.xislkld.mongodb.net/'
+
+mongoose.Promise = Promise;
+mongoose.connect(MONGO_URL);
+
+mongoose.connection.on('error', (error: Error)=> console.log(error));
