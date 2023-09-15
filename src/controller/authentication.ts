@@ -42,7 +42,15 @@ export const register = async(req: express.Request, res: express.Response ) => {
         const existingUser = await getUserByEmail(email);
 
         if(existingUser){
-            return res.sendStatus(400);
+            const response = {
+                code: 400,
+                message: 'Duplicate record',
+                data: {
+                    String: 'This user already exist',
+                    Object: existingUser,
+                }
+            }
+            return res.status(400).json(response);
         }
         const salt  = random();
         const user = await createUser({
