@@ -29,6 +29,10 @@ export const isOwner = async (req: express.Request, res: express.Response, next:
 }
 
 export const isAuthenticated = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const response = {
+        Code: 404,
+        String: "Login to access this resource"
+    }
     try {
         const sessionToken = req.cookies['BACKEND-REST-API']
         const existingUser =  getUserBySessionToken(sessionToken);
@@ -39,7 +43,10 @@ export const isAuthenticated = async (req: express.Request, res: express.Respons
             });
         }
         if (!sessionToken) {
-            return res.sendStatus(403);
+            
+            return res.status(403).json({
+                response
+            });
         }
        
 
