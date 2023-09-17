@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { get, identity, merge } from 'lodash';
+import { get, merge } from 'lodash';
 
 import { getUserBySessionToken } from '../db/users';
 
@@ -8,14 +8,18 @@ export const isOwner = async (req: express.Request, res: express.Response, next:
     try {
         const { id } = req.params;
         console.log(id)
-        const currentUserId = get(req, 'identity_id') as string;
-        console.log(currentUserId);
+        const sessionToken = req.cookies['BACKEND-REST-API']
+        const existingUser = await getUserBySessionToken(sessionToken);
+        merge(req, { identity: existingUser});
+        console.log("user ----> ", req);
+        const currentUserId = get(req, `identity._id`);
+        // console.log(currentUserId);
 
         if (!currentUserId) {
             return res.sendStatus(403);
         }
 
-        if (currentUserId.toString() !== id) {
+        if (currentUserId !== id) {
             return res.status(200).json({
                 status:403,
                 message: 'Unauthorized'
